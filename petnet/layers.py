@@ -63,7 +63,17 @@ def tanh_prime(x: Tensor) -> Tensor:
     y = tanh(x) 
     return 1 - y ** 2
 
+def sigm(x: Tensor) -> Tensor:
+    return 1/(1+np.exp(-x))
+
+def sigm_prime(x: Tensor) -> Tensor:
+    s = sigm(x)
+    return s * (1 - s)
 
 class Tanh(Activation):
     def __init__(self):
         super().__init__(tanh, tanh_prime)
+
+class Sigm(Activation):
+    def __init__(self):
+        super().__init__(sigm, sigm_prime)
