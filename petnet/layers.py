@@ -3,6 +3,10 @@ import numpy as np
 from petnet.tensor import Tensor
 from typing import Dict, Callable
 
+# Notes:
+# - Shapes are (height, width) not the other way around
+# - Layer's output is next layer input
+
 class Layer:
     def __init__(self) -> None:
         self.params: Dict[str, Tensor] = {}
@@ -25,6 +29,7 @@ class Linear(Layer):
     def forward(self, inputs: Tensor):
         """
         outputs = inputs @ w + b
+        (batch, output) = (batch, input) @ (input, output) 
         """
         self.inputs = inputs
         return inputs @ self.params["w"] + self.params["b"]
@@ -37,9 +42,22 @@ class Linear(Layer):
         | dy/db = a.T @ f'(x)
         | dy/dc = f'(x)
         """
-        self.grads["b"] = np.sum(grad, axis=0) # w.r.t b = 1 * w.r.t input of next layer
-        self.grads["w"] = self.inputs.T @ grad # w.r.t w = input *  w.r.t input of next layer
-        return grad @ self.params["w"].T # w.r.t input = w @  w.r.t input of next layer
+
+        # d\b = 1 * d\output | for each output
+        # (output) = sum_0(batch, output) 
+        # -> sum across batch for each output
+        self.grads["b"] = np.sum(grad, axis=0) 
+
+        # d\w = input * d\output  | for each individual edge
+        # Note: d\SUM_i(I_i * W_i) -> for specific i -> d\I_i * W_i 
+        # (input, output) = (input, batch) @ (batch, output) 
+        # -> sums across batch for each edge
+        self.grads["w"] = self.inputs.T @ grad 
+
+        # d\input = weights @  d\output | sum contribs of all edges from each input
+        # (batch, input) = (batch, output) @ (output, input)
+        # -> maintains batch dimension
+        return grad @ self.params["w"].T 
     
 F = Callable[[Tensor], Tensor]
 class Activation(Layer):
