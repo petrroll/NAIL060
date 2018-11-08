@@ -8,9 +8,10 @@ from typing import Dict, Callable
 # - Layer's output is next layer input
 
 class Layer:
-    def __init__(self) -> None:
+    def __init__(self, name: str = "") -> None:
         self.params: Dict[str, Tensor] = {}
         self.grads: Dict[str, Tensor] = {}
+        self.name = name
     
     def forward(self, inputs: Tensor) -> Tensor:
         raise NotImplementedError
@@ -19,10 +20,10 @@ class Layer:
         raise NotImplementedError
     
 class Linear(Layer):
-    def __init__(self, input_size: int, output_size: int) -> None:
+    def __init__(self, input_size: int, output_size: int, name: str = "") -> None:
         # inputs will be (batch_size, input_size)
         # outputs will be (batch_size, output_size)
-        super().__init__()
+        super().__init__(name)
         self.params["w"] = np.random.randn(input_size, output_size)
         self.params["b"] = np.random.randn(output_size)
 
@@ -62,8 +63,8 @@ class Linear(Layer):
     
 F = Callable[[Tensor], Tensor]
 class Activation(Layer):
-    def __init__(self, f: F, f_prime: F) -> None:
-        super().__init__()
+    def __init__(self, f: F, f_prime: F, name: str = "") -> None:
+        super().__init__(name)
         self.f = f
         self.f_prime = f_prime
 
@@ -90,9 +91,9 @@ def sigm_prime(x: Tensor) -> Tensor:
     return s * (1 - s)
 
 class Tanh(Activation):
-    def __init__(self):
-        super().__init__(tanh, tanh_prime)
+    def __init__(self, name: str = ""):
+        super().__init__(tanh, tanh_prime, name)
 
 class Sigm(Activation):
-    def __init__(self):
-        super().__init__(sigm, sigm_prime)
+    def __init__(self, name: str = ""):
+        super().__init__(sigm, sigm_prime, name)
