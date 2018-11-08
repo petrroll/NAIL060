@@ -35,7 +35,7 @@ word_max_len = 7
 bin_len = 5
 repre_size = word_max_len * bin_len
 
-positive_p = 1
+positive_p = 0.7
 
 # Positive words dictionary
 words = [
@@ -51,7 +51,7 @@ words = [
 # Prepare dictionary & positions translated to binary form
 translated_words = np.zeros((len(words), repre_size))
 translated_positions = np.zeros((len(words), len(words)))
-invalid_position = np.zeros(len(words))
+translated_positions_invalid = np.zeros(len(words))
 for i in range(len(words)):
     translated_words[i] = word_to_bin(words[i])
     translated_positions[i][i] = 1
@@ -59,24 +59,41 @@ for i in range(len(words)):
 # Prepare input & target data
 inputs = np.zeros((dta_size, repre_size))
 targets = np.zeros((dta_size, len(words)))
-for i in range(1000):
-    if random.random() <= positive_p:       
+for i in range(5000):
+    if random.random() <= positive_p:   
+        # Select positive example from translated dictionary
         random_word_i = random.randrange(0, len(words))
         inputs[i] = translated_words[random_word_i]
         targets[i] = translated_positions[random_word_i]
     else:
-        pass
+        # Create negative example
+        targets[i] = translated_positions_invalid
 
+        if random.random() <= 0.5:
+            # Modification of existing word
+            random_word_i = random.randrange(0, len(words))
+            word = list(words[random_word_i])
+            for j in range(len(word)):
+                word[j] = chr(random.randint(ord('a'), ord('z'))) if random.random() < 0.3 else word[j]
+
+            inputs[i] = word_to_bin(str(word), word_max_len, bin_len)
+        else:
+            # Create random binary array
+            input = np.zeros(word_max_len * bin_len)
+            for j in range(len(input)):
+                input[j] = 1 if random.random() < 0.3 else 0
+
+            inputs[i] = input
 
 
 net = NeuralNet([
     Linear(input_size=repre_size, output_size=20, name="lin1"),
     Tanh("tanh"),
     Linear(input_size=20, output_size=len(words)),
-    #Tanh()
+    Tanh()
 ])
 
-train(net, inputs, targets, 5000)
+train(net, inputs, targets, 1000)
 
 for x, y in zip(translated_words, translated_positions):
     predicted = net.forward(x)
