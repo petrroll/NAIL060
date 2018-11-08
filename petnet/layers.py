@@ -42,17 +42,18 @@ class Linear(Layer):
         | dy/db = a.T @ f'(x)
         | dy/dc = f'(x)
         """
+        batch_size = self.inputs.shape[0]
 
         # d\b = 1 * d\output | for each output
         # (output) = sum_0(batch, output) 
         # -> sum across batch for each output
-        self.grads["b"] = np.sum(grad, axis=0) 
+        self.grads["b"] = np.sum(grad, axis=0) / batch_size
 
         # d\w = input * d\output  | for each individual edge
         # Note: d\SUM_i(I_i * W_i) -> for specific i -> d\I_i * W_i 
         # (input, output) = (input, batch) @ (batch, output) 
         # -> sums across batch for each edge
-        self.grads["w"] = self.inputs.T @ grad 
+        self.grads["w"] = self.inputs.T @ grad / batch_size
 
         # d\input = weights @  d\output | sum contribs of all edges from each input
         # (batch, input) = (batch, output) @ (output, input)
