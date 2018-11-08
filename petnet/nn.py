@@ -1,4 +1,5 @@
 from typing import Sequence, Iterator, Tuple
+import numpy as np
 
 from petnet.tensor import Tensor
 from petnet.layers import Layer
@@ -11,6 +12,10 @@ class NeuralNet:
         for layer in self.layers:
             inputs = layer.forward(inputs)
         return inputs
+
+    def forward_single(self, input: Tensor) -> Tensor:
+        inputs = np.expand_dims(input, axis=0)
+        return self.forward(inputs)[0]
 
     def backward(self, grad: Tensor) -> Tensor:
         for layer in reversed(self.layers):
