@@ -2,7 +2,7 @@ import numpy as np
 import random
 
 from petnet.tensor import Tensor
-from petnet.train import train
+from petnet.train import train, evaluate
 from petnet.nn import NeuralNet
 from petnet.layers import Linear, Tanh, Sigm
 from petnet.data import BatchIterator, GenIterator, Epoch
@@ -36,7 +36,7 @@ word_max_len = 7
 bin_len = 5
 repre_size = word_max_len * bin_len
 
-positive_p = 0.5
+positive_p = 0.7
 
 words = [
     "hi",
@@ -45,7 +45,10 @@ words = [
     "create",
     "eat",
     "busstop"
-    "test"
+    "test",
+    "word",
+    "on"
+    "testing"
 ]
 # Prepare dictionary & positions translated to binary form
 translated_words = np.zeros((len(words), repre_size))
@@ -96,9 +99,21 @@ net = NeuralNet([
 ])
 
 # Train network
-train(net, GenIterator(lambda: gen_data(translated_words, translated_positions, translated_positions_invalid)), 1000)
+train(net, GenIterator(lambda: gen_data(translated_words, translated_positions, translated_positions_invalid)), 250)
 
 for x, y in zip(translated_words, translated_positions):
     predicted = net.forward(x)
     print(np.argmax(predicted), np.argmax(y))
 
+def is_correct(output, gold):
+    processed_g = np.argmax(gold)
+    if np.max(output) < 0.5:
+        processed_o = 0
+    else:
+        processed_o = np.argmax(output) 
+        if np.sum(output > 0.5) > 1: return False
+
+    return processed_g == processed_o
+
+inputs, targets = gen_data(translated_words, translated_positions, translated_positions_invalid)
+evaluate(net, inputs, targets, is_correct)

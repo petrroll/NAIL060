@@ -3,6 +3,7 @@ from petnet.nn import NeuralNet
 from petnet.loss import Loss, MSE
 from petnet.optim import Optimizer, SGD
 from petnet.data import DataIterator, BatchIterator
+from typing import Callable, Tuple
 
 def train(
     net: NeuralNet,
@@ -20,3 +21,18 @@ def train(
             net.backward(grad)
             optimizer.step(net)
         print(epoch, ":", epoch_loss)
+
+FCorrect = Callable[[Tensor, Tensor], bool]
+def evaluate(
+    net: NeuralNet,
+    inputs: Tensor,
+    targets: Tensor,
+    is_correct: FCorrect
+) -> None:
+    correct = 0
+    for i in range(len(inputs)):
+        output = net.forward_single(inputs[i])
+        gold = targets[i]
+        if is_correct(output, gold): correct += 1 
+
+    print(correct / len(inputs))
