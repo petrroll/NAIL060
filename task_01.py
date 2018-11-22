@@ -107,13 +107,14 @@ for x, y in zip(translated_words, translated_positions):
 
 def is_correct(output, gold):
     processed_g = np.argmax(gold)
-    if np.max(output) < 0.5:
-        processed_o = 0
+    if np.max(output) < 0.5: # our network guessed that the word isn't from dict
+        processed_o = 0 
     else:
         processed_o = np.argmax(output) 
-        if np.sum(output > 0.5) > 1: return False
+        if np.sum(output > 0.5) > 1: return False # multiple words from dictionary selected (stronger than just using just argmax)
 
     return processed_g == processed_o
 
+# Generate new set of data for final evaluation
 inputs, targets = gen_data(translated_words, translated_positions, translated_positions_invalid)
 evaluate(net, inputs, targets, is_correct)
