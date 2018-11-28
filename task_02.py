@@ -12,7 +12,7 @@ from petnet.tensor import Tensor
 from petnet.train import train, evaluate
 from petnet.nn import NeuralNet
 from petnet.layers import Linear, Tanh, Sigm
-from petnet.data import BatchIterator, GenIterator, Epoch
+from petnet.data import BatchIterator, GenIterator, Epoch, SampleIterator
 
 # Tranforms image to 2D binary array with custom B/W threshold
 def image_to_bin_array(im, treshold=100):
@@ -64,22 +64,34 @@ def tiles_to_pic(tiles, w, h):
 
     return new_im
 
+# Prepare data from image
 im = Image.open("./task_02_1.png")
 im = im.convert('L')
 
 flat_tiles = [tile_to_flat_array(x) for x in cut_to_tiles(im, 10, 10)]
-inputs = np.array(flat_tiles)
+flat_tiles_np = np.array(flat_tiles)
 
-tiles = [flat_array_to_tile(inputs[x], 10, 10) for x in range(np.size(inputs,0))]
-pic = tiles_to_pic(tiles, 100, 100)
-pic.show()
+data_iterator = SampleIterator(flat_tiles_np, flat_tiles_np, 1000, 1)
+
+# Create NN
+net = NeuralNet([
+    Linear(input_size=10*10, output_size=5, name="lin1"),
+    Sigm("sigm1"),
+    Linear(input_size=5, output_size=10*10),
+    Sigm()
+])
+
+# Train network
+train(net, data_iterator, 5000)
+
+# Forward tiles in order
+result_tiles_np = net.forward(flat_tiles_np)
+result_tiles_np = np.around(result_tiles_np)
+
+# Assemble original picture out of fotwarded tiles
+tiles = [flat_array_to_tile(result_tiles_np[x], 10, 10) for x in range(np.size(result_tiles_np, 0))]
+result_pic = tiles_to_pic(tiles, 100, 100)
+
+# Show picture & original for reference
+result_pic.show()
 im.show()
-
-
-print(inputs.shape)
-
-for i in range(4, 5):
-    tile = tile_to_flat_array(tiles[i])
-    flat_array_to_tile(tile, 10, 10)
-
-

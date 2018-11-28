@@ -1,6 +1,8 @@
 from typing import Iterator, NamedTuple
 
 import numpy as np
+import random as rnd
+
 from petnet.tensor import Tensor
 from typing import Callable, Tuple
 
@@ -49,3 +51,24 @@ class GenIterator(DataIterator):
         starts = np.arange(0, len(inputs), self.batch_size)
 
         return self.iterate(inputs, targets, starts, self.batch_size)
+
+
+class SampleIterator(DataIterator):
+    def __init__(self, inputs: Tensor, targets: Tensor, epoch_size: int = 1000, batch_size: int = 2) -> None:
+        self.batch_size = batch_size
+        self.epoch_size = epoch_size
+
+        self.inputs = inputs
+        self.targets = targets
+
+    def __call__(self) -> Iterator[Batch]:
+        epoch_inputs = []
+        epoch_targets = []
+
+        for i in range(self.epoch_size):
+            index = rnd.randrange(0, len(self.inputs))
+            epoch_inputs.append(self.inputs[index])
+            epoch_targets.append(self.targets[index])
+
+        starts = np.arange(0, len(self.inputs), self.batch_size)
+        return self.iterate(np.array(epoch_inputs), np.array(epoch_targets), starts, self.batch_size)
