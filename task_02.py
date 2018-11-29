@@ -64,34 +64,46 @@ def tiles_to_pic(tiles, w, h):
 
     return new_im
 
+def flat_arrays_to_pic(np_arrays, tile_w, tile_h, pic_w, pic_h):
+    result_tiles = [flat_array_to_tile(np_arrays[x], tile_w, tile_h) for x in range(np.size(np_arrays, 0))]
+    result_pic = tiles_to_pic(result_tiles, pic_h, pic_h)
+
+    return result_pic
+
 # Prepare data from image
-im = Image.open("./task_02_1.png")
-im = im.convert('L')
+input_pic = Image.open("./task_02_1.png")
+input_pic = input_pic.convert('L')
 
-flat_tiles = [tile_to_flat_array(x) for x in cut_to_tiles(im, 10, 10)]
-flat_tiles_np = np.array(flat_tiles)
+input_tiles = [tile_to_flat_array(x) for x in cut_to_tiles(input_pic, 10, 10)]
+input_tiles_np = np.array(input_tiles)
 
-data_iterator = SampleIterator(flat_tiles_np, flat_tiles_np, 1000, 1)
+data_iterator = SampleIterator(input_tiles_np, input_tiles_np, 10000, 1)
 
 # Create NN
+hidden_size = 6
 net = NeuralNet([
-    Linear(input_size=10*10, output_size=5, name="lin1"),
+    Linear(input_size=10*10, output_size=hidden_size, name="lin1"),
     Sigm("sigm1"),
-    Linear(input_size=5, output_size=10*10),
+    Linear(input_size=hidden_size, output_size=10*10),
     Sigm()
 ])
 
 # Train network
-train(net, data_iterator, 5000)
+train(net, data_iterator, 1000, optimizer=SGD(0.01))
 
 # Forward tiles in order
-result_tiles_np = net.forward(flat_tiles_np)
+result_tiles_np = net.forward(input_tiles_np)
 result_tiles_np = np.around(result_tiles_np)
 
 # Assemble original picture out of fotwarded tiles
-tiles = [flat_array_to_tile(result_tiles_np[x], 10, 10) for x in range(np.size(result_tiles_np, 0))]
-result_pic = tiles_to_pic(tiles, 100, 100)
+result_pic = flat_arrays_to_pic(result_tiles_np, 10, 10, 100, 100)
+
+# Unique tiles
+result_tiles_np_unique = np.unique(result_tiles_np, axis=0)
+input_tiles_np_unique = np.unique(input_tiles_np, axis=0)
+
+print(np.size(result_tiles_np_unique, 0), np.size(input_tiles_np_unique, 0))
 
 # Show picture & original for reference
 result_pic.show()
-im.show()
+flat_arrays_to_pic(input_tiles_np, 10, 10, 100, 100).show()
