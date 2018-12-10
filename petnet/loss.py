@@ -35,7 +35,7 @@ class MSEMinOf(Loss):
 
             batch_grads[batch_i] = (2 * (predicted[batch_i] - actual[batch_i][loss_min_index]))
 
-        return np.array(batch_grads)
+        return batch_grads
 
 
 

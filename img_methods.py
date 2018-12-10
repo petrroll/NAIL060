@@ -105,6 +105,7 @@ enh_move_ops = [move_left, move_right, move_down, move_up,
                     lambda x: move_right(move_down(x)), lambda x: move_right(move_up(x))]
 
 def enhance_tiles(input, w, h, enhance_ops):
+    # (batch, input_size) -> (batch, targets, input_size)
     result = []
     for i in range(np.size(input, 0)):
         pic = input[i]
