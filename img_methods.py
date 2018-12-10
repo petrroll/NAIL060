@@ -120,7 +120,7 @@ def enhance_tile(pic, w, h, enhance_ops):
     for op in enhance_ops:
         
         enhanced = op(pic_2d).flatten()
-        if (
+        if (    # Only take those enhancements that don't change the picture too much (30 %)
             np.sum(pic) != 0 and 
             np.sum(enhanced) < np.size(enhanced) and 
             np.abs(np.sum(enhanced) - np.sum(pic)) < np.size(pic) // 30
