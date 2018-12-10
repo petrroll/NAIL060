@@ -3,6 +3,11 @@ import random
 
 from PIL import Image
 
+
+# # #
+# Cut to tiles & reassamble methods
+# # #
+
 # Tranforms image to 2D binary array with custom B/W threshold
 def image_to_bin_array(im, treshold=100):
     im_arr = np.array(im)
@@ -59,6 +64,11 @@ def flat_arrays_to_pic(np_arrays, tile_w, tile_h, pic_w, pic_h):
 
     return result_pic
 
+
+# # #
+# Move enhance image methods
+# # #
+
 def move_right(pic_2d):
     result = np.zeros_like(pic_2d)
     result[:, 1:] = pic_2d[:, :-1]
@@ -90,28 +100,35 @@ def move_up(pic_2d):
 def pic_np_to_pic_np2d(pic_np, w, h):
     return 
 
-def enhance_tiles(input, w, h):
-    enhance_ops = [move_left, move_right, move_down, move_up,
+enh_move_ops = [move_left, move_right, move_down, move_up,
                     lambda x: move_left(move_down(x)), lambda x: move_left(move_up(x)),
                     lambda x: move_right(move_down(x)), lambda x: move_right(move_up(x))]
 
+def enhance_tiles(input, w, h, enhance_ops):
     result = []
     for i in range(np.size(input, 0)):
         pic = input[i]
-        pic_2d = np.reshape(pic, (w, h)) 
-
-        enhanced_tile = [pic]
-        for op in enhance_ops:
-            
-            enhanced = op(pic_2d).flatten()
-            if (
-                np.sum(pic) != 0 and 
-                np.sum(enhanced) < np.size(enhanced) and 
-                np.abs(np.sum(enhanced) - np.sum(pic)) < np.size(pic) // 30
-                ):
-                enhanced_tile.append(enhanced)
-
-        print(len(enhanced_tile))
-        result.append(np.array(enhanced_tile))
+        targets_for_tile = enhance_tile(pic, w, h, enhance_ops)
+        result.append(targets_for_tile)
 
     return np.array(result)
+
+def enhance_tile(pic, w, h, enhance_ops):
+    pic_2d = np.reshape(pic, (w, h)) 
+    targets_for_tile = [pic]
+    for op in enhance_ops:
+        
+        enhanced = op(pic_2d).flatten()
+        if (
+            np.sum(pic) != 0 and 
+            np.sum(enhanced) < np.size(enhanced) and 
+            np.abs(np.sum(enhanced) - np.sum(pic)) < np.size(pic) // 30
+            ):
+            targets_for_tile.append(enhanced)
+    
+    return np.array(targets_for_tile)
+# #
+# Rotate enhance image methods
+# # #
+
+enh_rot_ops = [lambda x: np.rot90(x, i) for i in range(1, 4)]

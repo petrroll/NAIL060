@@ -12,7 +12,7 @@ class NeuralNet:
         for layer in self.layers:
             inputs = layer.forward(inputs)
         return inputs
-
+    
     def forward_single(self, input: Tensor) -> Tensor:
         inputs = np.expand_dims(input, axis=0)
         return self.forward(inputs)[0]
