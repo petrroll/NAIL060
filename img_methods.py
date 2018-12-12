@@ -8,6 +8,14 @@ from PIL import Image
 # Cut to tiles & reassamble methods
 # # #
 
+# Loads an image, converts it to binary array, flattens it
+def load_img_to_flat_bin_arr(path):
+    img = Image.open(path)
+    img = img.convert('L')
+
+    return tile_to_flat_bin_array(img)
+
+
 # Tranforms image to 2D binary array with custom B/W threshold
 def image_to_bin_array(im, treshold=100):
     im_arr = np.array(im)
@@ -35,7 +43,7 @@ def cut_to_tiles(im, size_x, size_y):
     return tiles
 
 # Converts image to flat binary array
-def tile_to_flat_array(im):
+def tile_to_flat_bin_array(im):
     im_arr = image_to_bin_array(im)
     return im_arr.flatten()
 

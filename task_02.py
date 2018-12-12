@@ -14,7 +14,7 @@ from petnet.nn import NeuralNet
 from petnet.layers import Linear, Tanh, Sigm
 from petnet.data import BatchIterator, GenIterator, Epoch, SampleIterator
 
-from img_methods import flat_arrays_to_pic, cut_to_tiles, tile_to_flat_array, enhance_tiles, enh_move_ops, enh_rot_ops
+from img_methods import flat_arrays_to_pic, cut_to_tiles, tile_to_flat_bin_array, enhance_tiles, enh_move_ops, enh_rot_ops
 
 file_name ="./task_02_2.png"
 
@@ -32,7 +32,7 @@ lr = 0.03
 input_pic = Image.open(file_name)
 input_pic = input_pic.convert('L')
 
-input_tiles = [tile_to_flat_array(x) for x in cut_to_tiles(input_pic, tile_size, tile_size)]
+input_tiles = [tile_to_flat_bin_array(x) for x in cut_to_tiles(input_pic, tile_size, tile_size)]
 input_tiles_np = np.array(input_tiles)
 
 # Only one data enh can be true at one time

@@ -4,12 +4,13 @@ from os.path import isfile, join
 # Tile picture names are in format "<charIndex>_<whatever>"
 # ..where charIndex specifies which char should the tile be 
 # ..resolved to in picture->ASCII translation. 
+# charIndex is 0-based.
 
 # Mapping of charIndex -> specicif ASCII character
 char_i_to_char = {
-    "1":"|",
-    "2":"_",
-    "3":"/",
+    0:"|",
+    1:"_",
+    2:"/",
 }
 
 def get_picture_paths():
@@ -35,7 +36,9 @@ def get_data():
     char_i_to_files = {}
     file_to_char_i = {}
     for f in pic_names:
-        char_index, _ = f.split("_")
+        char_index_s, _ = f.split("_")
+        char_index = int(char_index_s)
+
         file_name_full = join(dir_path, f)
         if char_index in char_i_to_files:
             char_i_to_files[char_index].append(file_name_full)
@@ -44,6 +47,3 @@ def get_data():
         file_to_char_i[file_name_full] = char_index
 
     return (char_i_to_char, char_i_to_files, file_to_char_i)
-
-
-print(get_data())
