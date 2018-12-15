@@ -60,7 +60,7 @@ data_iterator = SampleIterator(inputs, targets, epoch_size, 1)
 
 
 # Create NN
-hidden_size = 6
+hidden_size = 15
 net = NeuralNet([
     Linear(input_size=tile_size ** 2, output_size=hidden_size, name="lin1"),
     Sigm("sigm1"),
@@ -89,4 +89,5 @@ for i in range(len(result_chars_i)):
     char = char_i_to_char[char_i]
 
     print(char, end="")
-    if i % tiles_per_line == 0: print("")
+    if i % tiles_per_line == tiles_per_line - 1: print("")
+
