@@ -11,6 +11,7 @@ char_i_to_char = {
     0:"|",
     1:"_",
     2:"/",
+    3:" "
 }
 
 def get_picture_paths():

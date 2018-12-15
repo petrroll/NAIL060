@@ -15,6 +15,15 @@ def load_img_to_flat_bin_arr(path):
 
     return tile_to_flat_bin_array(img)
 
+# Loads an image, converts it to binary array, cuts to tiles, flattens them
+def load_img_cut_to_flat_bin_arrs(path, tile_w, tile_h):
+    img = Image.open(path)
+    img = img.convert('L')
+
+    input_tiles = [tile_to_flat_bin_array(x) for x in cut_to_tiles(img, tile_w, tile_h)]
+    input_tiles_np = np.array(input_tiles)
+
+    return input_tiles_np
 
 # Tranforms image to 2D binary array with custom B/W threshold
 def image_to_bin_array(im, treshold=100):
@@ -33,14 +42,11 @@ def cut_tile(im, x, y, size_x, size_y):
 # ..not cutting one tile out of the image at a time
 # ..but cutting the whole image at the same time.
 def cut_to_tiles(im, size_x, size_y):
-    tiles = []
     w, h = im.size
     for y in range(0, h, size_y):
         for x in range(0, w, size_x):
             tile = cut_tile(im, x, y, size_x, size_y)
-            tiles.append(tile)
-
-    return tiles
+            yield tile
 
 # Converts image to flat binary array
 def tile_to_flat_bin_array(im):

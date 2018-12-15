@@ -14,7 +14,7 @@ from petnet.nn import NeuralNet
 from petnet.layers import Linear, Tanh, Sigm
 from petnet.data import BatchIterator, GenIterator, Epoch, SampleIterator
 
-from img_methods import flat_arrays_to_pic, cut_to_tiles, tile_to_flat_bin_array, enhance_tiles, enh_move_ops, enh_rot_ops
+from img_methods import flat_arrays_to_pic, enhance_tiles, enh_move_ops, enh_rot_ops, load_img_cut_to_flat_bin_arrs
 
 file_name ="./task_02_2.png"
 
@@ -29,11 +29,7 @@ epochs_num = 800
 lr = 0.03
 
 # Prepare data from image
-input_pic = Image.open(file_name)
-input_pic = input_pic.convert('L')
-
-input_tiles = [tile_to_flat_bin_array(x) for x in cut_to_tiles(input_pic, tile_size, tile_size)]
-input_tiles_np = np.array(input_tiles)
+input_tiles_np = load_img_cut_to_flat_bin_arrs(file_name, tile_size, tile_size)
 
 # Only one data enh can be true at one time
 enh_move = False
@@ -92,8 +88,6 @@ if enh_rot:
         result_tiles_np[i] = np.rot90(tile_2d, rot_coef).flatten()
 
 result_pic = flat_arrays_to_pic(result_tiles_np, tile_size, tile_size, pic_size, pic_size)
-
-
 
 # Show picture & original for reference
 result_pic.show()

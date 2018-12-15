@@ -15,7 +15,7 @@ from petnet.nn import NeuralNet
 from petnet.layers import Linear, Tanh, Sigm
 from petnet.data import BatchIterator, GenIterator, Epoch, SampleIterator
 
-from img_methods import load_img_to_flat_bin_arr
+from img_methods import load_img_to_flat_bin_arr, load_img_cut_to_flat_bin_arrs, flat_arrays_to_pic
 
 def get_input_targets(file_to_char_i, input_size, max_char_i):
     '''
@@ -37,14 +37,56 @@ def get_input_targets(file_to_char_i, input_size, max_char_i):
 
     return (inputs, targets)
     
+test_file_name = "./task_03_1.png"
+
 
 # Sizes
 tile_size = 16
 pic_size = 16 ** 2
+tiles_per_line = 20
 
-# Load data
+# Training size
+epoch_size = 10000
+epochs_num = 800
+
+lr = 0.03
+
+# Load data & prapare data
 char_i_to_char, char_i_to_files, file_to_char_i = dta.get_data()
 inputs, targets = get_input_targets(file_to_char_i, pic_size, len(char_i_to_char))
 
-print(inputs, targets)
 
+data_iterator = SampleIterator(inputs, targets, epoch_size, 1)
+
+
+# Create NN
+hidden_size = 6
+net = NeuralNet([
+    Linear(input_size=tile_size ** 2, output_size=hidden_size, name="lin1"),
+    Sigm("sigm1"),
+    
+    Linear(input_size=hidden_size, output_size=hidden_size),
+    Sigm("sigm1"),
+
+    Linear(input_size=hidden_size, output_size=len(char_i_to_char)),
+    Sigm()
+])
+
+
+# Train network
+train(net, data_iterator, epochs_num, optimizer=SGD(lr), loss=MSE())
+
+# load testing picture into flat tiles
+test_tiles_np = load_img_cut_to_flat_bin_arrs(test_file_name, tile_size, tile_size)
+flat_arrays_to_pic(test_tiles_np, tile_size, tile_size, tile_size * tiles_per_line, tile_size * tiles_per_line).show()
+
+
+result_chars_i_distr = net.forward(test_tiles_np)
+result_chars_i = np.argmax(result_chars_i_distr, axis=1)
+
+for i in range(len(result_chars_i)):
+    char_i = result_chars_i[i]
+    char = char_i_to_char[char_i]
+
+    print(char, end="")
+    if i % tiles_per_line == 0: print("")
