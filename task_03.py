@@ -6,7 +6,7 @@ from task_03_dta import dta_mapping as dta
 
 from petnet.loss import Loss, MSE, MSEMinOf
 from petnet.optim import Optimizer, SGD
-from petnet.data import DataIterator, BatchIterator
+from petnet.data import DataIterator, BatchIterator, SampleMultInputsIterator
 from typing import Callable, Tuple
 
 from petnet.tensor import Tensor
@@ -15,7 +15,7 @@ from petnet.nn import NeuralNet
 from petnet.layers import Linear, Tanh, Sigm
 from petnet.data import BatchIterator, GenIterator, Epoch, SampleIterator
 
-from img_methods import load_img_to_flat_bin_arr, load_img_cut_to_flat_bin_arrs, flat_arrays_to_pic
+from img_methods import load_img_to_flat_bin_arr, load_img_cut_to_flat_bin_arrs, flat_arrays_to_pic, enh_move_more_ops, enhance_tiles
 
 def get_input_targets(file_to_char_i, input_size, max_char_i):
     '''
@@ -47,7 +47,7 @@ tiles_per_line = 20
 
 # Training size
 epoch_size = 10000
-epochs_num = 800
+epochs_num = 2000
 
 lr = 0.03
 
@@ -55,12 +55,12 @@ lr = 0.03
 char_i_to_char, char_i_to_files, file_to_char_i = dta.get_data()
 inputs, targets = get_input_targets(file_to_char_i, pic_size, len(char_i_to_char))
 
-
-data_iterator = SampleIterator(inputs, targets, epoch_size, 1)
+enhanced_inputs = enhance_tiles(inputs, tile_size, tile_size, enh_move_more_ops)
+data_iterator = SampleMultInputsIterator(enhanced_inputs, targets, epoch_size, 1)
 
 
 # Create NN
-hidden_size = 15
+hidden_size = 20
 net = NeuralNet([
     Linear(input_size=tile_size ** 2, output_size=hidden_size, name="lin1"),
     Sigm("sigm1"),

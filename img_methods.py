@@ -115,8 +115,27 @@ def pic_np_to_pic_np2d(pic_np, w, h):
     return 
 
 enh_move_ops = [move_left, move_right, move_down, move_up,
+
                     lambda x: move_left(move_down(x)), lambda x: move_left(move_up(x)),
                     lambda x: move_right(move_down(x)), lambda x: move_right(move_up(x))]
+
+enh_move_basic_ops = [move_left, move_down, move_right, move_up]
+
+# All basic operations +
+# All unique two combinations that don't cancel each other out (left+right) +
+# All unique three-combinations where no two cancel each other out
+enh_move_more_ops = enh_move_basic_ops + \
+                            [lambda x: enh_move_basic_ops[fi](enh_move_basic_ops[gi](x)) \
+                            for fi in range(len(enh_move_basic_ops)) \
+                            for gi in range(len(enh_move_basic_ops)) \
+                            if fi >= gi and fi - gi != 2] + \
+                            [lambda x: enh_move_basic_ops[fi](enh_move_basic_ops[gi](enh_move_basic_ops[hi](x))) \
+                            for fi in range(len(enh_move_basic_ops)) \
+                            for gi in range(len(enh_move_basic_ops)) \
+                            for hi in range(len(enh_move_basic_ops)) \
+                            if fi >= gi and gi >= hi and fi - gi != 2 and fi - hi != 2 and gi - hi != 2]
+
+
 
 def enhance_tiles(input, w, h, enhance_ops):
     # (batch, input_size) -> (batch, targets, input_size)

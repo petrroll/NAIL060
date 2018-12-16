@@ -65,9 +65,24 @@ class SampleIterator(DataIterator):
         epoch_inputs = []
         epoch_targets = []
 
-        for i in range(self.epoch_size):
+        for _ in range(self.epoch_size):
             index = rnd.randrange(0, len(self.inputs))
             epoch_inputs.append(self.inputs[index])
+            epoch_targets.append(self.targets[index])
+
+        starts = np.arange(0, len(self.inputs), self.batch_size)
+        return self.iterate(np.array(epoch_inputs), np.array(epoch_targets), starts, self.batch_size)
+
+class SampleMultInputsIterator(SampleIterator):
+    def __call__(self) -> Iterator[Batch]:
+        epoch_inputs = []
+        epoch_targets = []
+
+        for _ in range(self.epoch_size):
+            index = rnd.randrange(0, np.size(self.inputs, 0))
+            index_i = rnd.randrange(0, np.size(self.inputs[index], 0))
+
+            epoch_inputs.append(self.inputs[index][index_i])
             epoch_targets.append(self.targets[index])
 
         starts = np.arange(0, len(self.inputs), self.batch_size)
