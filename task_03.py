@@ -38,12 +38,13 @@ def get_input_targets(file_to_char_i, input_size, max_char_i):
     return (inputs, targets)
     
 test_file_name = "./task_03_1.png"
+test_file_size = 320
 
 
 # Sizes
-tile_size = 16
-pic_size = 16 ** 2
-tiles_per_line = 20
+tile_size = 10
+pic_size = tile_size ** 2
+tiles_per_line = test_file_size // tile_size
 
 # Training size
 epoch_size = 10000

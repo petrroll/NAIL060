@@ -121,19 +121,36 @@ enh_move_ops = [move_left, move_right, move_down, move_up,
 
 enh_move_basic_ops = [move_left, move_down, move_right, move_up]
 
-# All basic operations +
-# All unique two combinations that don't cancel each other out (left+right) +
-# All unique three-combinations where no two cancel each other out
+# All basic operations (1-5)
 enh_move_more_ops = enh_move_basic_ops + \
-                            [lambda x: enh_move_basic_ops[fi](enh_move_basic_ops[gi](x)) \
-                            for fi in range(len(enh_move_basic_ops)) \
-                            for gi in range(len(enh_move_basic_ops)) \
-                            if fi >= gi and fi - gi != 2] + \
-                            [lambda x: enh_move_basic_ops[fi](enh_move_basic_ops[gi](enh_move_basic_ops[hi](x))) \
-                            for fi in range(len(enh_move_basic_ops)) \
-                            for gi in range(len(enh_move_basic_ops)) \
-                            for hi in range(len(enh_move_basic_ops)) \
-                            if fi >= gi and gi >= hi and fi - gi != 2 and fi - hi != 2 and gi - hi != 2]
+    [lambda x: enh_move_basic_ops[fi](enh_move_basic_ops[gi](x)) \
+        for fi in range(len(enh_move_basic_ops)) \
+        for gi in range(len(enh_move_basic_ops)) \
+        if fi >= gi and fi - gi != 2] + \
+    [lambda x: enh_move_basic_ops[fi](enh_move_basic_ops[gi](enh_move_basic_ops[hi](x))) \
+        for fi in range(len(enh_move_basic_ops)) \
+        for gi in range(len(enh_move_basic_ops)) \
+        for hi in range(len(enh_move_basic_ops)) \
+        if fi >= gi and gi >= hi and fi - gi != 2 and fi - hi != 2 and gi - hi != 2] + \
+    [lambda x: enh_move_basic_ops[fi](enh_move_basic_ops[gi](enh_move_basic_ops[hi](enh_move_basic_ops[li](x)))) \
+        for fi in range(len(enh_move_basic_ops)) \
+        for gi in range(len(enh_move_basic_ops)) \
+        for hi in range(len(enh_move_basic_ops)) \
+        for li in range(len(enh_move_basic_ops)) \
+        if fi >= gi and gi >= hi and hi >= li and \
+            fi - gi != 2 and fi - hi != 2 and gi - hi != 2 and \
+            fi - li != 2 and gi - li != 2 and hi - li != 2 ] + \
+    [lambda x: enh_move_basic_ops[fi](enh_move_basic_ops[gi](enh_move_basic_ops[hi](enh_move_basic_ops[li](enh_move_basic_ops[ri](x))))) \
+        for fi in range(len(enh_move_basic_ops)) \
+        for gi in range(len(enh_move_basic_ops)) \
+        for hi in range(len(enh_move_basic_ops)) \
+        for li in range(len(enh_move_basic_ops)) \
+        for ri in range(len(enh_move_basic_ops)) \
+        if fi >= gi and gi >= hi and hi >= li and li >= ri and \
+            fi - gi != 2 and fi - hi != 2 and gi - hi != 2 and \
+            fi - li != 2 and gi - li != 2 and hi - li != 2 and \
+            fi - ri != 2 and gi - ri != 2 and hi - ri != 2 and li - ri != 2 ]
+
 
 
 
