@@ -126,32 +126,32 @@ enh_move_more_ops = enh_move_basic_ops + \
     [lambda x: enh_move_basic_ops[fi](enh_move_basic_ops[gi](x)) \
         for fi in range(len(enh_move_basic_ops)) \
         for gi in range(len(enh_move_basic_ops)) \
-        if fi >= gi and fi - gi != 2] + \
-    [lambda x: enh_move_basic_ops[fi](enh_move_basic_ops[gi](enh_move_basic_ops[hi](x))) \
-        for fi in range(len(enh_move_basic_ops)) \
-        for gi in range(len(enh_move_basic_ops)) \
-        for hi in range(len(enh_move_basic_ops)) \
-        if fi >= gi and gi >= hi and fi - gi != 2 and fi - hi != 2 and gi - hi != 2] + \
-    [lambda x: enh_move_basic_ops[fi](enh_move_basic_ops[gi](enh_move_basic_ops[hi](enh_move_basic_ops[li](x)))) \
-        for fi in range(len(enh_move_basic_ops)) \
-        for gi in range(len(enh_move_basic_ops)) \
-        for hi in range(len(enh_move_basic_ops)) \
-        for li in range(len(enh_move_basic_ops)) \
-        if fi >= gi and gi >= hi and hi >= li and \
-            fi - gi != 2 and fi - hi != 2 and gi - hi != 2 and \
-            fi - li != 2 and gi - li != 2 and hi - li != 2 ] + \
-    [lambda x: enh_move_basic_ops[fi](enh_move_basic_ops[gi](enh_move_basic_ops[hi](enh_move_basic_ops[li](enh_move_basic_ops[ri](x))))) \
-        for fi in range(len(enh_move_basic_ops)) \
-        for gi in range(len(enh_move_basic_ops)) \
-        for hi in range(len(enh_move_basic_ops)) \
-        for li in range(len(enh_move_basic_ops)) \
-        for ri in range(len(enh_move_basic_ops)) \
-        if fi >= gi and gi >= hi and hi >= li and li >= ri and \
-            fi - gi != 2 and fi - hi != 2 and gi - hi != 2 and \
-            fi - li != 2 and gi - li != 2 and hi - li != 2 and \
-            fi - ri != 2 and gi - ri != 2 and hi - ri != 2 and li - ri != 2 ]
-
-
+        if fi >= gi and fi - gi != 2]# + \
+#    [lambda x: enh_move_basic_ops[fi](enh_move_basic_ops[gi](enh_move_basic_ops[hi](x))) \
+#        for fi in range(len(enh_move_basic_ops)) \
+#        for gi in range(len(enh_move_basic_ops)) \
+#        for hi in range(len(enh_move_basic_ops)) \
+#        if fi >= gi and gi >= hi and fi - gi != 2 and fi - hi != 2 and gi - hi != 2] + \
+#    [lambda x: enh_move_basic_ops[fi](enh_move_basic_ops[gi](enh_move_basic_ops[hi](enh_move_basic_ops[li](x)))) \
+#        for fi in range(len(enh_move_basic_ops)) \
+#        for gi in range(len(enh_move_basic_ops)) \
+#        for hi in range(len(enh_move_basic_ops)) \
+#        for li in range(len(enh_move_basic_ops)) \
+#        if fi >= gi and gi >= hi and hi >= li and \
+#            fi - gi != 2 and fi - hi != 2 and gi - hi != 2 and \
+#            fi - li != 2 and gi - li != 2 and hi - li != 2 ] + \
+#    [lambda x: enh_move_basic_ops[fi](enh_move_basic_ops[gi](enh_move_basic_ops[hi](enh_move_basic_ops[li](enh_move_basic_ops[ri](x))))) \
+#        for fi in range(len(enh_move_basic_ops)) \
+#        for gi in range(len(enh_move_basic_ops)) \
+#        for hi in range(len(enh_move_basic_ops)) \
+#        for li in range(len(enh_move_basic_ops)) \
+#        for ri in range(len(enh_move_basic_ops)) \
+#        if fi >= gi and gi >= hi and hi >= li and li >= ri and \
+#            fi - gi != 2 and fi - hi != 2 and gi - hi != 2 and \
+#            fi - li != 2 and gi - li != 2 and hi - li != 2 and \
+#            fi - ri != 2 and gi - ri != 2 and hi - ri != 2 and li - ri != 2 ]
+#
+#
 
 
 def enhance_tiles(input, w, h, enhance_ops):
@@ -173,9 +173,9 @@ def enhance_tile(pic, w, h, enhance_ops):
         if (    # Only take those enhancements that don't change the picture too much (30 %)
             np.sum(pic) != 0 and 
             np.sum(enhanced) < np.size(enhanced) and 
-            np.abs(np.sum(enhanced) - np.sum(pic)) < np.size(pic) // 30
+            np.abs(np.sum(enhanced) - np.sum(pic)) < np.size(pic) // 50
             ):
-            targets_for_tile.append(enhanced)
+            targets_for_tile.append(enhanced) 
     
     return np.array(targets_for_tile)
 # #

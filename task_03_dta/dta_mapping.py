@@ -8,10 +8,16 @@ from os.path import isfile, join
 
 # Mapping of charIndex -> specicif ASCII character
 char_i_to_char = {
-    0:"|",
-    1:"_",
-    2:"/",
-    3:" "
+    0: "|",
+    1: "_",
+    2: "/",
+    3: " ",
+    4: "\\",
+    5: "x",
+    6: "=",
+    7: ")",
+    8: "(",
+    9: "-",
 }
 
 def get_picture_paths():
@@ -37,7 +43,7 @@ def get_data():
     char_i_to_files = {}
     file_to_char_i = {}
     for f in pic_names:
-        char_index_s, _ = f.split("_")
+        char_index_s = f.split("_")[0]
         char_index = int(char_index_s)
 
         file_name_full = join(dir_path, f)

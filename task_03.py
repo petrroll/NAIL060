@@ -27,15 +27,17 @@ def get_input_targets(file_to_char_i, input_size, max_char_i):
 
     inputs = np.zeros((inputs_len, input_size))
     targets = np.zeros((inputs_len, max_char_i))
+    char_is = np.zeros(inputs_len)
 
     input_i = 0
     for path, char_i in file_to_char_i.items():      
         inputs[input_i] = load_img_to_flat_bin_arr(path)
         targets[input_i][char_i] = 1
+        char_is[input_i] = char_i
 
         input_i += 1
 
-    return (inputs, targets)
+    return (inputs, targets, char_is)
     
 test_file_name = "./task_03_1.png"
 test_file_size = 320
@@ -47,27 +49,27 @@ pic_size = tile_size ** 2
 tiles_per_line = test_file_size // tile_size
 
 # Training size
-epoch_size = 10000
-epochs_num = 2000
+epoch_size = 100000
+epochs_num = 500
 
-lr = 0.03
+lr = 0.015
 
 # Load data & prapare data
 char_i_to_char, char_i_to_files, file_to_char_i = dta.get_data()
-inputs, targets = get_input_targets(file_to_char_i, pic_size, len(char_i_to_char))
+inputs, targets, char_is = get_input_targets(file_to_char_i, pic_size, len(char_i_to_char))
 
 enhanced_inputs = enhance_tiles(inputs, tile_size, tile_size, enh_move_more_ops)
 data_iterator = SampleMultInputsIterator(enhanced_inputs, targets, epoch_size, 1)
-
+#data_iterator = SampleIterator(inputs,targets , epoch_size, 1)
 
 # Create NN
-hidden_size = 20
+hidden_size = 50
 net = NeuralNet([
     Linear(input_size=tile_size ** 2, output_size=hidden_size, name="lin1"),
-    Sigm("sigm1"),
+    Tanh(),
     
     Linear(input_size=hidden_size, output_size=hidden_size),
-    Sigm("sigm1"),
+    Tanh(),
 
     Linear(input_size=hidden_size, output_size=len(char_i_to_char)),
     Sigm()
@@ -80,6 +82,11 @@ train(net, data_iterator, epochs_num, optimizer=SGD(lr), loss=MSE())
 # load testing picture into flat tiles
 test_tiles_np = load_img_cut_to_flat_bin_arrs(test_file_name, tile_size, tile_size)
 flat_arrays_to_pic(test_tiles_np, tile_size, tile_size, tile_size * tiles_per_line, tile_size * tiles_per_line).show()
+
+# Test original tiles
+result_orig_tiles = net.forward(inputs)
+result_orig_tiles_chars_i = np.argmax(result_orig_tiles, axis=1)
+print(np.sum(result_orig_tiles_chars_i == char_is) / len(result_orig_tiles_chars_i))
 
 
 result_chars_i_distr = net.forward(test_tiles_np)
