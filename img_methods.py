@@ -126,12 +126,12 @@ enh_move_more_ops = enh_move_basic_ops + \
     [lambda x: enh_move_basic_ops[fi](enh_move_basic_ops[gi](x)) \
         for fi in range(len(enh_move_basic_ops)) \
         for gi in range(len(enh_move_basic_ops)) \
-        if fi >= gi and fi - gi != 2]# + \
+        if fi >= gi and fi - gi != 2] #+ \
 #    [lambda x: enh_move_basic_ops[fi](enh_move_basic_ops[gi](enh_move_basic_ops[hi](x))) \
 #        for fi in range(len(enh_move_basic_ops)) \
 #        for gi in range(len(enh_move_basic_ops)) \
 #        for hi in range(len(enh_move_basic_ops)) \
-#        if fi >= gi and gi >= hi and fi - gi != 2 and fi - hi != 2 and gi - hi != 2] + \
+#        if fi >= gi and gi >= hi and fi - gi != 2 and fi - hi != 2 and gi - hi != 2]# + \
 #    [lambda x: enh_move_basic_ops[fi](enh_move_basic_ops[gi](enh_move_basic_ops[hi](enh_move_basic_ops[li](x)))) \
 #        for fi in range(len(enh_move_basic_ops)) \
 #        for gi in range(len(enh_move_basic_ops)) \

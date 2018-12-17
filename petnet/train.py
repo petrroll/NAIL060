@@ -14,13 +14,15 @@ def train(
 ) -> None:
     for epoch in range(num_epochs):
         epoch_loss = 0.0
+        batch_i = 0
         for batch in iterator():
             predicted = net.forward(batch.inputs)
             epoch_loss += loss.loss(predicted, batch.targets)
             grad = loss.grad(predicted, batch.targets)
             net.backward(grad)
             optimizer.step(net)
-        print(epoch, ":", epoch_loss)
+            batch_i += 1
+        print(epoch, ":", epoch_loss / batch_i)
 
 FCorrect = Callable[[Tensor, Tensor], bool]
 def evaluate(

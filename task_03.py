@@ -5,7 +5,7 @@ from PIL import Image
 from task_03_dta import dta_mapping as dta 
 
 from petnet.loss import Loss, MSE, MSEMinOf
-from petnet.optim import Optimizer, SGD
+from petnet.optim import Optimizer, SGD, SGDDecay
 from petnet.data import DataIterator, BatchIterator, SampleMultInputsIterator
 from typing import Callable, Tuple
 
@@ -49,27 +49,28 @@ pic_size = tile_size ** 2
 tiles_per_line = test_file_size // tile_size
 
 # Training size
-epoch_size = 100000
+epoch_size = 1000
 epochs_num = 500
+batch_size = 1
 
-lr = 0.015
+lr = 0.03
+dec_per_epoch = 0.988
 
 # Load data & prapare data
 char_i_to_char, char_i_to_files, file_to_char_i = dta.get_data()
 inputs, targets, char_is = get_input_targets(file_to_char_i, pic_size, len(char_i_to_char))
 
 enhanced_inputs = enhance_tiles(inputs, tile_size, tile_size, enh_move_more_ops)
-data_iterator = SampleMultInputsIterator(enhanced_inputs, targets, epoch_size, 1)
-#data_iterator = SampleIterator(inputs,targets , epoch_size, 1)
+data_iterator = SampleMultInputsIterator(enhanced_inputs, targets, epoch_size, batch_size)
 
 # Create NN
-hidden_size = 50
+hidden_size = 20
 net = NeuralNet([
     Linear(input_size=tile_size ** 2, output_size=hidden_size, name="lin1"),
     Tanh(),
     
-    Linear(input_size=hidden_size, output_size=hidden_size),
-    Tanh(),
+    #Linear(input_size=hidden_size, output_size=hidden_size),
+    #Tanh(),
 
     Linear(input_size=hidden_size, output_size=len(char_i_to_char)),
     Sigm()
@@ -77,7 +78,7 @@ net = NeuralNet([
 
 
 # Train network
-train(net, data_iterator, epochs_num, optimizer=SGD(lr), loss=MSE())
+train(net, data_iterator, epochs_num, optimizer=SGDDecay(lr, dec_per_epoch, epoch_size // batch_size), loss=MSE())
 
 # load testing picture into flat tiles
 test_tiles_np = load_img_cut_to_flat_bin_arrs(test_file_name, tile_size, tile_size)
