@@ -23,7 +23,7 @@ tile_size = 10
 pic_size = 100
 
 # Training size
-epoch_size = 10000
+epoch_size = 1000
 epochs_num = 800
 
 lr = 0.03

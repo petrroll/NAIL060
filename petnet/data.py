@@ -32,7 +32,7 @@ class BatchIterator(DataIterator):
         self.targets = targets
 
     def __call__(self) -> Iterator[Batch]:
-        starts = np.arange(0, len(self.inputs), self.batch_size)
+        starts = np.arange(0, np.size(self.inputs, 0), self.batch_size)
         if self.shuffle:
             np.random.shuffle(starts)
 
@@ -70,7 +70,7 @@ class SampleIterator(DataIterator):
             epoch_inputs.append(self.inputs[index])
             epoch_targets.append(self.targets[index])
 
-        starts = np.arange(0, len(self.inputs), self.batch_size)
+        starts = np.arange(0, np.size(epoch_inputs, 0), self.batch_size)
         return self.iterate(np.array(epoch_inputs), np.array(epoch_targets), starts, self.batch_size)
 
 class SampleMultInputsIterator(SampleIterator):
@@ -85,5 +85,5 @@ class SampleMultInputsIterator(SampleIterator):
             epoch_inputs.append(self.inputs[index][index_i])
             epoch_targets.append(self.targets[index])
 
-        starts = np.arange(0, len(self.inputs), self.batch_size)
+        starts = np.arange(0, np.size(epoch_inputs, 0), self.batch_size)
         return self.iterate(np.array(epoch_inputs), np.array(epoch_targets), starts, self.batch_size)
